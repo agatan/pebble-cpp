@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_SUITE(ast)
 
     BOOST_AUTO_TEST_CASE(to_string)
     {
-      std::pair<std::string, ast::expression> test_cases[] = {
+      std::pair<char const*, ast::expression> test_cases[] = {
         {"4", std::make_shared<ast::int_const>(4)},
         {"(IDENT variable)", std::make_shared<ast::ident>("variable")},
         {"TRUE", std::make_shared<ast::bool_const>(true)},
@@ -24,7 +24,9 @@ BOOST_AUTO_TEST_SUITE(ast)
                 std::make_shared<ast::bool_const>(true)
               }
             )
-        }
+        },
+        {"(NOT TRUE)", std::make_shared<ast::bool_negative>(std::make_shared<ast::bool_const>(true))},
+        {"(NEG 1)", std::make_shared<ast::negative>(std::make_shared<ast::int_const>(1))}
       };
 
       for (auto&& test_case : test_cases) {

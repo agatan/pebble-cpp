@@ -2,6 +2,7 @@
 #define __PEBBLE_SYNTAX_AST_HPP_
 
 #include <pebble/syntax/ast_fwd.hpp>
+#include <pebble/utils/stringify.hpp>
 
 #include <vector>
 
@@ -10,20 +11,15 @@ namespace pebble {
 
     namespace ast {
 
-      template<class T>
-      std::string stringify(T const& x)
-      {
-        return boost::apply_visitor([](auto& e){ return e->to_string(); }, x);
-      }
-
       class int_const
       {
       private:
         int data_;
 
       public:
-        int_const() : int_const(0) {};
-        int_const(int d): data_(d) {}
+        int_const() = default;
+        explicit int_const(int d): data_(d) {}
+
         std::string to_string() const { return std::to_string(data_); }
         int data() const { return data_; }
       };
@@ -34,8 +30,9 @@ namespace pebble {
         std::string name_;
 
       public:
-        ident(): ident("") {}
-        ident(std::string const& name): name_(name) {}
+        ident() = default;
+        explicit ident(std::string const& name): name_(name) {}
+
         std::string to_string() const { return "(IDENT " + name_ + ")"; }
         std::string const& name() const { return name_; }
       };
@@ -46,8 +43,9 @@ namespace pebble {
         bool data_;
 
       public:
-        bool_const(): bool_const(false) {}
-        bool_const(bool d): data_(d) {}
+        bool_const() = default;
+        explicit bool_const(bool d): data_(d) {}
+
         std::string to_string() const
         {
           if (data_)
@@ -61,7 +59,6 @@ namespace pebble {
       class unit_const
       {
       public:
-        unit_const() {}
         std::string to_string() const { return "UNIT"; }
       };
 
@@ -72,11 +69,39 @@ namespace pebble {
         std::vector<expression> args_;
 
       public:
-        apply() : apply(std::make_shared<unit_const>(), {}) {}
-        apply(expression const& f, std::vector<expression> const& a)
+        apply() = default;
+        explicit apply(expression const& f, std::vector<expression> const& a)
           : function_(f), args_(a) {}
 
         std::string to_string() const;
+      };
+
+      class bool_negative
+      {
+      private:
+        expression operand_;
+      public:
+        bool_negative() = default;
+        explicit bool_negative(expression const& operand): operand_(operand) {}
+
+        std::string to_string() const
+        {
+          return "(NOT " + utils::stringify(operand_) + ")";
+        }
+      };
+
+      class negative
+      {
+      private:
+        expression operand_;
+      public:
+        negative() = default;
+        explicit negative(expression const& operand): operand_(operand) {}
+
+        std::string to_string() const
+        {
+          return "(NEG " + utils::stringify(operand_) + ")";
+        }
       };
 
     } // namespace ast

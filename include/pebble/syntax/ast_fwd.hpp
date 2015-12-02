@@ -15,13 +15,17 @@ namespace pebble {
       PEBBLE_MAKE_NODE(bool_const);
       PEBBLE_MAKE_NODE(unit_const);
       PEBBLE_MAKE_NODE(apply);
+      PEBBLE_MAKE_NODE(bool_negative);
+      PEBBLE_MAKE_NODE(negative);
 
       using expression = boost::variant <
         int_const_ptr,
         ident_ptr,
         bool_const_ptr,
         unit_const_ptr,
-        apply_ptr
+        apply_ptr,
+        bool_negative_ptr,
+        negative_ptr
           >;
 
     } // namespace ast
