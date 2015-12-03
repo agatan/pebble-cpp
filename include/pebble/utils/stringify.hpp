@@ -1,7 +1,7 @@
 #ifndef __PEBBLE_UTILS_STRINGIFY_HPP_
 #define __PEBBLE_UTILS_STRINGIFY_HPP_
 
-#include <boost/variant.hpp>
+#include <boost/variant/apply_visitor.hpp>
 #include <string>
 
 namespace pebble {

@@ -1,7 +1,7 @@
 #ifndef __PEBBLE_SYNTAX_AST_FWD_HPP_
 #define __PEBBLE_SYNTAX_AST_FWD_HPP_
 
-#include <boost/variant.hpp>
+#include <boost/variant/variant.hpp>
 #include <memory>
 
 namespace pebble {
