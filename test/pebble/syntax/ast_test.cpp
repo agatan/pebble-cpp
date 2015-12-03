@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_SUITE(ast)
   BOOST_AUTO_TEST_SUITE(to_string)
     namespace ast = pebble::syntax::ast;
 
-    BOOST_AUTO_TEST_CASE(to_string)
+    BOOST_AUTO_TEST_CASE(expression_to_string)
     {
       std::pair<char const*, ast::expression> test_cases[] = {
         {"4", ast::make_expr<ast::int_const_expr>(4)},
@@ -54,9 +54,9 @@ BOOST_AUTO_TEST_SUITE(ast)
 
       for (auto&& test_case : test_cases) {
         ast::expression expr;
-        std::string expected;
+        char const* expected;
         std::tie(expected, expr) = test_case;
-        BOOST_CHECK_EQUAL(expected, pebble::utils::stringify(expr));
+        BOOST_TEST(expected == pebble::utils::stringify(expr));
       }
     }
 
