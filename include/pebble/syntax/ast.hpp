@@ -104,6 +104,26 @@ namespace pebble {
         }
       };
 
+      class if_expr
+      {
+      private:
+        expression cond_;
+        expression then_;
+        expression else_;
+      public:
+        if_expr() = default;
+        explicit if_expr(expression const& c, expression const& t, expression const& e)
+          : cond_(c), then_(t), else_(e) {}
+        explicit if_expr(expression const& c, expression const& t)
+          : cond_(c), then_(t), else_(std::make_shared<unit_expr>()) {}
+
+        std::string to_string() const
+        {
+          return "(IF " + utils::stringify(cond_) + " " +
+            utils::stringify(then_) + " " + utils::stringify(else_) + ")";
+        }
+      };
+
     } // namespace ast
 
   } // namespace syntax

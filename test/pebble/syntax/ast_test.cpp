@@ -31,6 +31,11 @@ BOOST_AUTO_TEST_SUITE(ast)
         },
         {"(NEG 1)", std::make_shared<ast::negative_expr>(
             std::make_shared<ast::int_const_expr>(1))},
+        {"(IF FALSE 1 2)", std::make_shared<ast::if_expr>(
+            std::make_shared<ast::bool_const_expr>(false),
+            std::make_shared<ast::int_const_expr>(1),
+            std::make_shared<ast::int_const_expr>(2))
+        }
       };
 
       for (auto&& test_case : test_cases) {
