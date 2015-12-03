@@ -60,6 +60,10 @@ BOOST_AUTO_TEST_SUITE(ast)
       }
     }
 
+    BOOST_AUTO_TEST_CASE(type_to_string) {
+      BOOST_TEST("(TYPE Int)" == ast::type("Int").to_string());
+    }
+
   BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -12,6 +12,18 @@ namespace pebble {
 
     namespace ast {
 
+      class type
+      {
+      private:
+        std::string name_;
+
+      public:
+        type() = default;
+        explicit type(std::string const& n) : name_(n) {}
+
+        std::string to_string() const { return "(TYPE " + name_ + ")"; }
+      };
+
       class int_const_expr
       {
       private:
