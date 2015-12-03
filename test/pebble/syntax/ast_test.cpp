@@ -79,7 +79,11 @@ BOOST_AUTO_TEST_SUITE(ast)
                 std::vector<ast::expression>{ast::make_expr<ast::bool_const_expr>(true)}
               )
             )
-        }
+        },
+        {"(LET (x (TYPE Int)) 1)",
+          ast::make_definition<ast::let_def>("x", ast::type("Int"),
+              ast::make_expr<ast::int_const_expr>(1))
+        },
       };
 
       for (auto&& test_case : test_cases) {

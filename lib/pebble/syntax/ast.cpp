@@ -50,6 +50,18 @@ namespace pebble {
         return result;
       }
 
+      std::string let_def::to_string() const
+      {
+        std::string result("(LET ");
+        if (type_) {
+          result += "(" + name_ + " " + type_->to_string() + ")";
+        } else {
+          result += name_;
+        }
+        result += " " + utils::stringify(init_) + ")";
+        return result;
+      }
+
     } // namespace ast
   } // namespace syntax
 } // namespace pebble

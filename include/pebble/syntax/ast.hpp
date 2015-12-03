@@ -4,6 +4,8 @@
 #include <pebble/syntax/ast_fwd.hpp>
 #include <pebble/utils/stringify.hpp>
 
+#include <boost/optional.hpp>
+
 #include <vector>
 #include <utility>
 
@@ -212,6 +214,29 @@ namespace pebble {
             type const& ret,
             expression const& body)
           : name_(name), args_(args), ret_(ret), body_(body)
+        {}
+
+        std::string to_string() const;
+      };
+
+      class let_def
+      {
+      private:
+        std::string name_;
+        boost::optional<ast::type> type_;
+        expression init_;
+
+      public:
+        let_def() = default;
+        explicit let_def(std::string const& name, expression const& init)
+          : name_(name), type_(boost::none), init_(init)
+        {}
+
+        explicit let_def(
+            std::string const& name,
+            ast::type const& type,
+            expression const& init)
+          : name_(name), type_(type), init_(init)
         {}
 
         std::string to_string() const;

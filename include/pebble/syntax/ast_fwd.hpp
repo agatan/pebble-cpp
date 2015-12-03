@@ -37,9 +37,11 @@ namespace pebble {
           >;
 
       PEBBLE_MAKE_NODE(function_def);
+      PEBBLE_MAKE_NODE(let_def);
 
       using definition = boost::variant <
-        function_def_ptr
+        function_def_ptr,
+        let_def_ptr
           >;
 
     } // namespace ast
