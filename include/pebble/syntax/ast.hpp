@@ -5,6 +5,7 @@
 #include <pebble/utils/stringify.hpp>
 
 #include <vector>
+#include <utility>
 
 namespace pebble {
   namespace syntax {
@@ -123,6 +124,12 @@ namespace pebble {
             utils::stringify(then_) + " " + utils::stringify(else_) + ")";
         }
       };
+
+      template <class T, typename... Args>
+      expression make_expr(Args&&... args)
+      {
+        return std::move(std::make_shared<T>(std::forward<Args>(args)...));
+      }
 
     } // namespace ast
 

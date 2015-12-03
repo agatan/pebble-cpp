@@ -12,29 +12,29 @@ BOOST_AUTO_TEST_SUITE(ast)
     BOOST_AUTO_TEST_CASE(to_string)
     {
       std::pair<char const*, ast::expression> test_cases[] = {
-        {"4", std::make_shared<ast::int_const_expr>(4)},
-        {"(IDENT variable)", std::make_shared<ast::ident_expr>("variable")},
-        {"TRUE", std::make_shared<ast::bool_const_expr>(true)},
-        {"UNIT", std::make_shared<ast::unit_expr>()},
+        {"4", ast::make_expr<ast::int_const_expr>(4)},
+        {"(IDENT variable)", ast::make_expr<ast::ident_expr>("variable")},
+        {"TRUE", ast::make_expr<ast::bool_const_expr>(true)},
+        {"UNIT", ast::make_expr<ast::unit_expr>()},
         {"(APPLY (IDENT f) 4 TRUE)",
-          std::make_shared<ast::apply_expr>(
-              std::make_shared<ast::ident_expr>("f"),
+          ast::make_expr<ast::apply_expr>(
+              ast::make_expr<ast::ident_expr>("f"),
               std::vector<ast::expression>{
-                std::make_shared<ast::int_const_expr>(4),
-                std::make_shared<ast::bool_const_expr>(true)
+                ast::make_expr<ast::int_const_expr>(4),
+                ast::make_expr<ast::bool_const_expr>(true)
               }
             )
         },
         {"(NOT TRUE)",
-          std::make_shared<ast::bool_negative_expr>(
-              std::make_shared<ast::bool_const_expr>(true))
+          ast::make_expr<ast::bool_negative_expr>(
+              ast::make_expr<ast::bool_const_expr>(true))
         },
-        {"(NEG 1)", std::make_shared<ast::negative_expr>(
-            std::make_shared<ast::int_const_expr>(1))},
-        {"(IF FALSE 1 2)", std::make_shared<ast::if_expr>(
-            std::make_shared<ast::bool_const_expr>(false),
-            std::make_shared<ast::int_const_expr>(1),
-            std::make_shared<ast::int_const_expr>(2))
+        {"(NEG 1)", ast::make_expr<ast::negative_expr>(
+            ast::make_expr<ast::int_const_expr>(1))},
+        {"(IF FALSE 1 2)", ast::make_expr<ast::if_expr>(
+            ast::make_expr<ast::bool_const_expr>(false),
+            ast::make_expr<ast::int_const_expr>(1),
+            ast::make_expr<ast::int_const_expr>(2))
         }
       };
 
