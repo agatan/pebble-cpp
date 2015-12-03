@@ -147,6 +147,18 @@ namespace pebble {
         }
       };
 
+      class block_expr
+      {
+      private:
+        std::vector<expression> exprs_;
+      public:
+        block_expr() = default;
+        explicit block_expr(std::vector<expression> const& e)
+          : exprs_(e) {}
+
+        std::string to_string() const;
+      };
+
       template <class T, typename... Args>
       expression make_expr(Args&&... args)
       {

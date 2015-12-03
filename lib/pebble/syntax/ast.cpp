@@ -22,6 +22,16 @@ namespace pebble {
         return result;
       }
 
+      std::string block_expr::to_string() const
+      {
+        std::string result("(BLOCK");
+        for (auto it = exprs_.begin(); it != exprs_.end(); ++it) {
+          result += " " + utils::stringify(*it);
+        }
+        result += ")";
+        return result;
+      }
+
     } // namespace ast
   } // namespace syntax
 } // namespace pebble

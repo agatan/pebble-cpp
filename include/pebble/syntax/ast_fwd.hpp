@@ -19,6 +19,7 @@ namespace pebble {
       PEBBLE_MAKE_NODE(negative_expr);
       PEBBLE_MAKE_NODE(if_expr);
       PEBBLE_MAKE_NODE(binop_expr);
+      PEBBLE_MAKE_NODE(block_expr);
 
       using expression = boost::variant <
         int_const_expr_ptr,
@@ -29,7 +30,8 @@ namespace pebble {
         bool_negative_expr_ptr,
         negative_expr_ptr,
         if_expr_ptr,
-        binop_expr_ptr
+        binop_expr_ptr,
+        block_expr_ptr
           >;
 
     } // namespace ast
