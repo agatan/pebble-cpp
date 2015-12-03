@@ -8,6 +8,18 @@ namespace pebble {
   namespace syntax {
     namespace ast {
 
+      class type
+      {
+      private:
+        std::string name_;
+
+      public:
+        type() = default;
+        explicit type(std::string const& n) : name_(n) {}
+
+        std::string to_string() const { return "(TYPE " + name_ + ")"; }
+      };
+
 #define PEBBLE_MAKE_NODE(name) class name; using name##_ptr = std::shared_ptr<name>
 
       PEBBLE_MAKE_NODE(int_const_expr);
