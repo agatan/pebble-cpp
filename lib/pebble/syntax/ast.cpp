@@ -32,6 +32,24 @@ namespace pebble {
         return result;
       }
 
+      std::string function_def::to_string() const
+      {
+        auto result("(DEF " + name_ + " (");
+
+        for (auto it = args_.begin(); it != args_.end(); ++it) {
+          result += "(" + it->first + " " + it->second.to_string() + ")";
+          if (it + 1 != args_.end())
+            result += " ";
+        }
+
+        result += ")";
+
+        result += " (RET " + ret_.to_string() + ") (BODY " +
+          utils::stringify(body_) + "))";
+
+        return result;
+      }
+
     } // namespace ast
   } // namespace syntax
 } // namespace pebble

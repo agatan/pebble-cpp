@@ -24,6 +24,9 @@ namespace pebble {
         std::string to_string() const { return "(TYPE " + name_ + ")"; }
       };
 
+
+      // expressions
+
       class int_const_expr
       {
       private:
@@ -186,6 +189,36 @@ namespace pebble {
 
       template <class T, typename... Args>
       expression make_expr(Args&&... args)
+      {
+        return std::move(std::make_shared<T>(std::forward<Args>(args)...));
+      }
+
+
+      // definitions
+
+      class function_def
+      {
+      private:
+        std::string name_;
+        std::vector<std::pair<std::string, type>> args_;
+        type ret_;
+        expression body_;
+
+      public:
+        function_def() = default;
+        explicit function_def(
+            std::string const& name,
+            std::vector<std::pair<std::string, type>> const& args,
+            type const& ret,
+            expression const& body)
+          : name_(name), args_(args), ret_(ret), body_(body)
+        {}
+
+        std::string to_string() const;
+      };
+
+      template <class T, typename... Args>
+      definition make_definition(Args&&... args)
       {
         return std::move(std::make_shared<T>(std::forward<Args>(args)...));
       }

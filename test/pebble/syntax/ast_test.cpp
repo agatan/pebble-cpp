@@ -64,6 +64,32 @@ BOOST_AUTO_TEST_SUITE(ast)
       BOOST_TEST("(TYPE Int)" == ast::type("Int").to_string());
     }
 
+    BOOST_AUTO_TEST_CASE(definition_to_string) {
+      using arg = std::pair<std::string, ast::type>;
+
+      std::pair<char const*, ast::definition> test_cases[] = {
+        {"(DEF f ((x (TYPE Int)) (y (TYPE Float))) (RET (TYPE Bool)) (BODY (BLOCK TRUE)))",
+          ast::make_definition<ast::function_def>("f",
+              std::vector<arg> {
+                std::make_pair("x", ast::type("Int")),
+                std::make_pair("y", ast::type("Float"))
+              },
+              ast::type("Bool"),
+              ast::make_expr<ast::block_expr>(
+                std::vector<ast::expression>{ast::make_expr<ast::bool_const_expr>(true)}
+              )
+            )
+        }
+      };
+
+      for (auto&& test_case : test_cases) {
+        char const* expected;
+        ast::definition def;
+        std::tie(expected, def) = test_case;
+        BOOST_TEST(expected == pebble::utils::stringify(def));
+      }
+    }
+
   BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
