@@ -11,6 +11,7 @@ namespace pebble {
 #define PEBBLE_MAKE_NODE(name) class name; using name##_ptr = std::shared_ptr<name>
 
       PEBBLE_MAKE_NODE(int_const_expr);
+      PEBBLE_MAKE_NODE(float_const_expr);
       PEBBLE_MAKE_NODE(ident_expr);
       PEBBLE_MAKE_NODE(bool_const_expr);
       PEBBLE_MAKE_NODE(unit_expr);
@@ -23,6 +24,7 @@ namespace pebble {
 
       using expression = boost::variant <
         int_const_expr_ptr,
+        float_const_expr_ptr,
         ident_expr_ptr,
         bool_const_expr_ptr,
         unit_expr_ptr,

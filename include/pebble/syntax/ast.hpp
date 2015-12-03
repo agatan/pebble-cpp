@@ -25,6 +25,19 @@ namespace pebble {
         int data() const { return data_; }
       };
 
+      class float_const_expr
+      {
+      private:
+        float data_;
+
+      public:
+        float_const_expr() = default;
+        explicit float_const_expr(float d): data_(d) {}
+
+        std::string to_string() const { return std::to_string(data_); }
+        float data() const { return data_; }
+      };
+
       class ident_expr
       {
       private:

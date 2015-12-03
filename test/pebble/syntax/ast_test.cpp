@@ -13,6 +13,7 @@ BOOST_AUTO_TEST_SUITE(ast)
     {
       std::pair<char const*, ast::expression> test_cases[] = {
         {"4", ast::make_expr<ast::int_const_expr>(4)},
+        {"1.000000", ast::make_expr<ast::float_const_expr>(1.0)},
         {"(IDENT variable)", ast::make_expr<ast::ident_expr>("variable")},
         {"TRUE", ast::make_expr<ast::bool_const_expr>(true)},
         {"UNIT", ast::make_expr<ast::unit_expr>()},
