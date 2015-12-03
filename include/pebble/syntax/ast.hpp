@@ -11,40 +11,40 @@ namespace pebble {
 
     namespace ast {
 
-      class int_const
+      class int_const_expr
       {
       private:
         int data_;
 
       public:
-        int_const() = default;
-        explicit int_const(int d): data_(d) {}
+        int_const_expr() = default;
+        explicit int_const_expr(int d): data_(d) {}
 
         std::string to_string() const { return std::to_string(data_); }
         int data() const { return data_; }
       };
 
-      class ident
+      class ident_expr
       {
       private:
         std::string name_;
 
       public:
-        ident() = default;
-        explicit ident(std::string const& name): name_(name) {}
+        ident_expr() = default;
+        explicit ident_expr(std::string const& name): name_(name) {}
 
         std::string to_string() const { return "(IDENT " + name_ + ")"; }
         std::string const& name() const { return name_; }
       };
 
-      class bool_const
+      class bool_const_expr
       {
       private:
         bool data_;
 
       public:
-        bool_const() = default;
-        explicit bool_const(bool d): data_(d) {}
+        bool_const_expr() = default;
+        explicit bool_const_expr(bool d): data_(d) {}
 
         std::string to_string() const
         {
@@ -56,33 +56,33 @@ namespace pebble {
         bool data() const { return data_; }
       };
 
-      class unit_const
+      class unit_expr
       {
       public:
         std::string to_string() const { return "UNIT"; }
       };
 
-      class apply
+      class apply_expr
       {
       private:
         expression function_;
         std::vector<expression> args_;
 
       public:
-        apply() = default;
-        explicit apply(expression const& f, std::vector<expression> const& a)
+        apply_expr() = default;
+        explicit apply_expr(expression const& f, std::vector<expression> const& a)
           : function_(f), args_(a) {}
 
         std::string to_string() const;
       };
 
-      class bool_negative
+      class bool_negative_expr
       {
       private:
         expression operand_;
       public:
-        bool_negative() = default;
-        explicit bool_negative(expression const& operand): operand_(operand) {}
+        bool_negative_expr() = default;
+        explicit bool_negative_expr(expression const& operand): operand_(operand) {}
 
         std::string to_string() const
         {
@@ -90,13 +90,13 @@ namespace pebble {
         }
       };
 
-      class negative
+      class negative_expr
       {
       private:
         expression operand_;
       public:
-        negative() = default;
-        explicit negative(expression const& operand): operand_(operand) {}
+        negative_expr() = default;
+        explicit negative_expr(expression const& operand): operand_(operand) {}
 
         std::string to_string() const
         {

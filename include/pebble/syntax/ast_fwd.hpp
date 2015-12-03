@@ -10,22 +10,22 @@ namespace pebble {
 
 #define PEBBLE_MAKE_NODE(name) class name; using name##_ptr = std::shared_ptr<name>
 
-      PEBBLE_MAKE_NODE(int_const);
-      PEBBLE_MAKE_NODE(ident);
-      PEBBLE_MAKE_NODE(bool_const);
-      PEBBLE_MAKE_NODE(unit_const);
-      PEBBLE_MAKE_NODE(apply);
-      PEBBLE_MAKE_NODE(bool_negative);
-      PEBBLE_MAKE_NODE(negative);
+      PEBBLE_MAKE_NODE(int_const_expr);
+      PEBBLE_MAKE_NODE(ident_expr);
+      PEBBLE_MAKE_NODE(bool_const_expr);
+      PEBBLE_MAKE_NODE(unit_expr);
+      PEBBLE_MAKE_NODE(apply_expr);
+      PEBBLE_MAKE_NODE(bool_negative_expr);
+      PEBBLE_MAKE_NODE(negative_expr);
 
       using expression = boost::variant <
-        int_const_ptr,
-        ident_ptr,
-        bool_const_ptr,
-        unit_const_ptr,
-        apply_ptr,
-        bool_negative_ptr,
-        negative_ptr
+        int_const_expr_ptr,
+        ident_expr_ptr,
+        bool_const_expr_ptr,
+        unit_expr_ptr,
+        apply_expr_ptr,
+        bool_negative_expr_ptr,
+        negative_expr_ptr
           >;
 
     } // namespace ast

@@ -12,21 +12,25 @@ BOOST_AUTO_TEST_SUITE(ast)
     BOOST_AUTO_TEST_CASE(to_string)
     {
       std::pair<char const*, ast::expression> test_cases[] = {
-        {"4", std::make_shared<ast::int_const>(4)},
-        {"(IDENT variable)", std::make_shared<ast::ident>("variable")},
-        {"TRUE", std::make_shared<ast::bool_const>(true)},
-        {"UNIT", std::make_shared<ast::unit_const>()},
+        {"4", std::make_shared<ast::int_const_expr>(4)},
+        {"(IDENT variable)", std::make_shared<ast::ident_expr>("variable")},
+        {"TRUE", std::make_shared<ast::bool_const_expr>(true)},
+        {"UNIT", std::make_shared<ast::unit_expr>()},
         {"(APPLY (IDENT f) 4 TRUE)",
-          std::make_shared<ast::apply>(
-              std::make_shared<ast::ident>("f"),
+          std::make_shared<ast::apply_expr>(
+              std::make_shared<ast::ident_expr>("f"),
               std::vector<ast::expression>{
-                std::make_shared<ast::int_const>(4),
-                std::make_shared<ast::bool_const>(true)
+                std::make_shared<ast::int_const_expr>(4),
+                std::make_shared<ast::bool_const_expr>(true)
               }
             )
         },
-        {"(NOT TRUE)", std::make_shared<ast::bool_negative>(std::make_shared<ast::bool_const>(true))},
-        {"(NEG 1)", std::make_shared<ast::negative>(std::make_shared<ast::int_const>(1))}
+        {"(NOT TRUE)",
+          std::make_shared<ast::bool_negative_expr>(
+              std::make_shared<ast::bool_const_expr>(true))
+        },
+        {"(NEG 1)", std::make_shared<ast::negative_expr>(
+            std::make_shared<ast::int_const_expr>(1))},
       };
 
       for (auto&& test_case : test_cases) {

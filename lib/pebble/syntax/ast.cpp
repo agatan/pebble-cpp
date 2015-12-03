@@ -7,7 +7,7 @@ namespace pebble {
   namespace syntax {
     namespace ast {
 
-      std::string apply::to_string() const
+      std::string apply_expr::to_string() const
       {
         std::string function{ utils::stringify(function_) };
 
