@@ -35,6 +35,10 @@ BOOST_AUTO_TEST_SUITE(ast)
             ast::make_expr<ast::bool_const_expr>(false),
             ast::make_expr<ast::int_const_expr>(1),
             ast::make_expr<ast::int_const_expr>(2))
+        },
+        {"(+ 1 2)", ast::make_expr<ast::binop_expr>("+",
+            ast::make_expr<ast::int_const_expr>(1),
+            ast::make_expr<ast::int_const_expr>(2))
         }
       };
 

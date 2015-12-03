@@ -125,6 +125,28 @@ namespace pebble {
         }
       };
 
+      class binop_expr
+      {
+      private:
+        std::string op_;
+        expression lhs_;
+        expression rhs_;
+      public:
+        binop_expr() = default;
+        explicit binop_expr(
+            std::string const& op,
+            expression const& l,
+            expression const& r)
+          : op_(op), lhs_(l), rhs_(r)
+        {}
+
+        std::string to_string() const
+        {
+          return "(" + op_ + " " + utils::stringify(lhs_) +
+            " " + utils::stringify(rhs_) + ")";
+        }
+      };
+
       template <class T, typename... Args>
       expression make_expr(Args&&... args)
       {
