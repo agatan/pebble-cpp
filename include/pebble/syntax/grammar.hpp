@@ -78,10 +78,13 @@ namespace pebble {
       x3::rule<class add_sub_expr, ast::expression> const add_sub_expr;
       x3::rule<class if_expr, ast::expression> const if_expr;
 
+      x3::rule<class statement, ast::statement> const statement;
+
       x3::rule<class identifier, std::string> const identifier;
       x3::rule<class real_args, std::vector<ast::expression>> const real_args;
 
 
+      // base or helper rules
       auto sep = (lit('\n') | "\r\n");
 
       auto identifier_def = x3::lexeme[
@@ -89,6 +92,15 @@ namespace pebble {
         ]
         ;
 
+      auto real_args_def =
+          ('(' >> -sep >> ')')[([](auto& ctx) { _val(ctx) = std::vector<ast::expression>{}; })]
+        | ('(' >> -sep >> (expression % (',' >> -sep)) >> -sep >> ')')[
+            ([](auto& ctx) { _val(ctx) = _attr(ctx); })]
+        ;
+
+
+
+      // expressions
       auto expression_def =
           if_expr[helper::assign_action()]
         | add_sub_expr[helper::assign_action()]
@@ -180,11 +192,14 @@ namespace pebble {
 
 
 
-      auto real_args_def =
-          ('(' >> -sep >> ')')[([](auto& ctx) { _val(ctx) = std::vector<ast::expression>{}; })]
-        | ('(' >> -sep >> (expression % (',' >> -sep)) >> -sep >> ')')[
-            ([](auto& ctx) { _val(ctx) = _attr(ctx); })]
+      // statements
+      auto statement_def =
+          (
+            expression >> ';'
+          )[
+            ([](auto& ctx) { _val(ctx) = ast::make_stmt<ast::expr_stmt>(_attr(ctx)); })]
         ;
+
 
       BOOST_SPIRIT_DEFINE(
           expression,
@@ -197,10 +212,13 @@ namespace pebble {
           add_sub_expr,
           if_expr,
 
+          statement,
+
           real_args);
 
     } // namespace grammar
     using grammar::expression;
+    using grammar::statement;
 
   } // namespace syntax
 } // namespace pebble

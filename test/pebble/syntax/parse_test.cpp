@@ -97,20 +97,18 @@ BOOST_AUTO_TEST_SUITE(parse)
     }
   }
 
-  BOOST_AUTO_TEST_CASE(expression) {
+
+  BOOST_AUTO_TEST_CASE(expression_statement) {
     std::pair<char const*, char const*> test_cases[] = {
-      {"TRUE", "true"},
-      {"FALSE", "false"},
-      {"123", "123"},
+      {"(STMT (APPLY (IDENT f)))", "f();"}
     };
 
     for (auto&& test_case : test_cases) {
       char const* expected;
-      char const* target;
-      std::tie(expected, target) = test_case;
-      ast::expression expr(*syntax::parse_expression(target));
-
-      BOOST_TEST(expected == pebble::utils::stringify(expr));
+      char const* src;
+      std::tie(expected, src) = test_case;
+      ast::statement stmt(*syntax::parse_statement(src));
+      BOOST_TEST(expected == pebble::utils::stringify(stmt));
     }
   }
 

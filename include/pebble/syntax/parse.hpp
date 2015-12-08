@@ -18,6 +18,12 @@ namespace pebble {
     boost::optional<ast::expression>
       parse_expression(std::string const&);
 
+    boost::optional<ast::statement>
+      parse_statement(iterator_t&, string_iterator_t const&, iterator_t const&);
+
+    boost::optional<ast::statement>
+      parse_statement(std::string const&);
+
   } // namespace syntax
 } // namespace pebble
 
