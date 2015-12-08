@@ -81,6 +81,22 @@ BOOST_AUTO_TEST_SUITE(parse)
     BOOST_TEST("(+ (* 1 2) 3)" == pebble::utils::stringify(expr));
   }
 
+  BOOST_AUTO_TEST_CASE(if_expression) {
+    std::pair<char const*, char const*> test_cases[] = {
+      {"(IF TRUE 1 2)", "if (true) 1 else 2"},
+      {"(IF FALSE (APPLY (IDENT f)) UNIT)", "if (false) f()"},
+      {"(IF TRUE (IF FALSE 1 2) UNIT)", "if(true) if(false) 1 else 2 "}
+    };
+
+    for (auto&& test_case : test_cases) {
+      char const* expected;
+      char const* src;
+      std::tie(expected, src) = test_case;
+      ast::expression expr(*syntax::parse_expression(src));
+      BOOST_TEST(expected == pebble::utils::stringify(expr));
+    }
+  }
+
   BOOST_AUTO_TEST_CASE(expression) {
     std::pair<char const*, char const*> test_cases[] = {
       {"TRUE", "true"},

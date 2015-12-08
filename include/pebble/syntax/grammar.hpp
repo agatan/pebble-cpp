@@ -76,6 +76,7 @@ namespace pebble {
       x3::rule<class unary_expr, ast::expression> const unary_expr;
       x3::rule<class mul_div_expr, ast::expression> const mul_div_expr;
       x3::rule<class add_sub_expr, ast::expression> const add_sub_expr;
+      x3::rule<class if_expr, ast::expression> const if_expr;
 
       x3::rule<class identifier, std::string> const identifier;
       x3::rule<class real_args, std::vector<ast::expression>> const real_args;
@@ -89,8 +90,35 @@ namespace pebble {
         ;
 
       auto expression_def =
-          add_sub_expr
+          if_expr[helper::assign_action()]
+        | add_sub_expr[helper::assign_action()]
         ;
+
+      auto if_expr_def =
+          (
+            helper::keyword("if") > -sep > '(' > -sep > expression > -sep > ')'
+            > -sep > expression > -sep > -(helper::keyword("else") > -sep > expression)
+          )[
+            ([](auto& ctx) {
+              ast::expression const& cond(boost::fusion::at_c<0>(_attr(ctx)));
+              ast::expression const& then_(boost::fusion::at_c<1>(_attr(ctx)));
+              auto const& else_(boost::fusion::at_c<2>(_attr(ctx)));
+              if (else_) {
+                _val(ctx) = ast::make_expr<ast::if_expr>(
+                    cond,
+                    then_,
+                    *else_
+                  );
+              } else {
+                _val(ctx) = ast::make_expr<ast::if_expr>(
+                    cond,
+                    then_
+                  );
+              }
+            })
+          ]
+        ;
+
 
       auto add_sub_expr_def =
           mul_div_expr[helper::assign_action()]
@@ -167,6 +195,7 @@ namespace pebble {
           unary_expr,
           mul_div_expr,
           add_sub_expr,
+          if_expr,
 
           real_args);
 
