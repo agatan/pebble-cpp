@@ -128,4 +128,24 @@ BOOST_AUTO_TEST_SUITE(parse)
     }
   }
 
+
+  BOOST_AUTO_TEST_CASE(function) {
+    std::pair<char const*, char const*> test_cases[] = {
+      {"(DEF f ((x (TYPE Int)) (y (TYPE Float))) (RET (TYPE Bool)) (BODY (BLOCK_EXPR (STMT TRUE))))",
+       "def f(x: Int, y: Float): Bool = { true }"
+      },
+      {"(DEF f () (RET (TYPE Unit)) (BODY UNIT))",
+       "def f() = ()"
+      }
+    };
+
+    for (auto&& test_case : test_cases) {
+      char const* expected;
+      char const* src;
+      std::tie(expected, src) = test_case;
+      ast::definition def(*syntax::parse_definition(src));
+      BOOST_TEST(expected == pebble::utils::stringify(def));
+    }
+  }
+
 BOOST_AUTO_TEST_SUITE_END()

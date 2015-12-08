@@ -82,8 +82,15 @@ namespace pebble {
 
       x3::rule<class statement, ast::statement> const statement;
 
+      x3::rule<class definition, ast::definition> const definition;
+      x3::rule<class fun_def, ast::definition> const fun_def;
+
       x3::rule<class identifier, std::string> const identifier;
+      x3::rule<class uidentifier, std::string> const uidentifier;
       x3::rule<class real_args, std::vector<ast::expression>> const real_args;
+      x3::rule<class arg, std::pair<std::string, ast::type>> const arg;
+      x3::rule<class def_args, std::vector<std::pair<std::string, ast::type>>> const def_args;
+      x3::rule<class type, ast::type> const type;
 
 
       // base or helper rules
@@ -94,10 +101,39 @@ namespace pebble {
         ]
         ;
 
+      auto uidentifier_def = x3::lexeme[
+          x3::upper >> *(x3::alnum | char('_'))
+        ]
+        ;
+
       auto real_args_def =
           ('(' >> -sep >> ')')[([](auto& ctx) { _val(ctx) = std::vector<ast::expression>{}; })]
         | ('(' >> -sep >> (expression % (',' >> -sep)) >> -sep >> ')')[
             ([](auto& ctx) { _val(ctx) = _attr(ctx); })]
+        ;
+
+      auto arg_def =
+          (
+            identifier > ':' > type
+          ) [
+            ([](auto& ctx) {
+              _val(ctx) = std::make_pair(
+                  boost::fusion::at_c<0>(_attr(ctx)),
+                  boost::fusion::at_c<1>(_attr(ctx))
+                );
+            })
+          ]
+        ;
+
+      auto def_args_def =
+          (lit('(') >> ')')[([](auto& ctx) { _val(ctx) = std::vector<std::pair<std::string, ast::type>>(); })]
+        | ('(' >> (arg % ',') >> ')') [helper::assign_action()]
+        ;
+
+      auto type_def =
+          uidentifier[
+            ([](auto& ctx) { _val(ctx) = ast::type(_attr(ctx)); })
+          ]
         ;
 
 
@@ -226,10 +262,47 @@ namespace pebble {
         ;
 
 
+
+      // definitions
+      auto definition_def =
+          fun_def[helper::assign_action()]
+        ;
+
+      auto fun_def_def =
+          (
+            helper::keyword("def") > identifier > def_args > -(':' > type)
+            > '=' > expression
+          ) [
+            ([](auto& ctx) {
+               std::string const& name(boost::fusion::at_c<0>(_attr(ctx)));
+               std::vector<std::pair<std::string, ast::type>> const&
+                 args(boost::fusion::at_c<1>(_attr(ctx)));
+               boost::optional<ast::type> const& ret(boost::fusion::at_c<2>(_attr(ctx)));
+               ast::expression const& body(boost::fusion::at_c<3>(_attr(ctx)));
+
+               if (ret) {
+                 _val(ctx) = ast::make_definition<ast::function_def>(
+                     name,
+                     args,
+                     *ret,
+                     body
+                 );
+               } else {
+                 _val(ctx) = ast::make_definition<ast::function_def>(
+                     name,
+                     args,
+                     ast::type("Unit"),
+                     body
+                 );
+               }
+            })
+          ]
+        ;
+
+
       BOOST_SPIRIT_DEFINE(
           expression,
           constant,
-          identifier,
           primary_expr,
           postfix_expr,
           unary_expr,
@@ -241,11 +314,21 @@ namespace pebble {
 
           statement,
 
-          real_args);
+          definition,
+          fun_def,
+
+          real_args,
+          identifier,
+          uidentifier,
+          def_args,
+          arg,
+          type
+          );
 
     } // namespace grammar
     using grammar::expression;
     using grammar::statement;
+    using grammar::definition;
 
   } // namespace syntax
 } // namespace pebble
