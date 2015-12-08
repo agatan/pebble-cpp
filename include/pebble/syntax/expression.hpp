@@ -8,6 +8,11 @@ namespace pebble {
   namespace syntax {
     namespace ast {
       // expressions
+      template <class T, typename... Args>
+      expression make_expr(Args&&... args)
+      {
+        return std::move(std::make_shared<T>(std::forward<Args>(args)...));
+      }
 
       class int_const_expr
       {
@@ -160,20 +165,19 @@ namespace pebble {
       class block_expr
       {
       private:
-        std::vector<expression> exprs_;
+        std::vector<statement> stmts_;
+        expression ret_;
       public:
         block_expr() = default;
-        explicit block_expr(std::vector<expression> const& e)
-          : exprs_(e) {}
+        explicit block_expr(std::vector<statement> const& e)
+          : stmts_(e), ret_(make_expr<unit_expr>()) {}
+
+        block_expr(std::vector<statement> const& s, expression const& e)
+          : stmts_(s), ret_(e) {}
 
         std::string to_string() const;
       };
 
-      template <class T, typename... Args>
-      expression make_expr(Args&&... args)
-      {
-        return std::move(std::make_shared<T>(std::forward<Args>(args)...));
-      }
     } // namespace ast
   } // namespace syntax
 } // namespace pebble

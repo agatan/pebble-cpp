@@ -3,5 +3,6 @@
 
 #include <pebble/syntax/expression.hpp>
 #include <pebble/syntax/definition.hpp>
+#include <pebble/syntax/statement.hpp>
 
 #endif

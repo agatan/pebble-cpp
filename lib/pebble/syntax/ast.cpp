@@ -25,9 +25,10 @@ namespace pebble {
       std::string block_expr::to_string() const
       {
         std::string result("(BLOCK");
-        for (auto it = exprs_.begin(); it != exprs_.end(); ++it) {
+        for (auto it = stmts_.begin(); it != stmts_.end(); ++it) {
           result += " " + utils::stringify(*it);
         }
+        result += " " + utils::stringify(ret_);
         result += ")";
         return result;
       }

@@ -56,6 +56,14 @@ namespace pebble {
         let_def_ptr
           >;
 
+      PEBBLE_MAKE_NODE(def_stmt);
+      PEBBLE_MAKE_NODE(expr_stmt);
+
+      using statement = boost::variant <
+        def_stmt_ptr,
+        expr_stmt_ptr
+          >;
+
     } // namespace ast
   } // namespace syntax
 } // namespace pebble
