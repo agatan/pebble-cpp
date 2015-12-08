@@ -39,6 +39,15 @@ namespace pebble {
           static bool const allow_trailing_dot = false;
         };
         x3::real_parser<double, pebble_strict_float_policies> const fp_;
+
+        struct assign_action
+        {
+          template <typename Context>
+          void operator()(Context& ctx)
+          {
+            _val(ctx) = _attr(ctx);
+          }
+        };
       } // namespace helper
 
 
@@ -46,6 +55,7 @@ namespace pebble {
       x3::rule<class constant, ast::expression> const constant;
       x3::rule<class primary_expr, ast::expression> const primary_expr;
       x3::rule<class postfix_expr, ast::expression> const postfix_expr;
+      x3::rule<class unary_expr, ast::expression> const unary_expr;
 
       x3::rule<class identifier, std::string> const identifier;
       x3::rule<class real_args, std::vector<ast::expression>> const real_args;
@@ -59,7 +69,19 @@ namespace pebble {
         ;
 
       auto expression_def =
-          postfix_expr
+          unary_expr
+        ;
+
+      auto unary_expr_def =
+          postfix_expr[helper::assign_action()]
+        | ('-' >> -sep >> unary_expr)[
+            ([](auto& ctx) {
+               _val(ctx) = ast::make_expr<ast::negative_expr>(_attr(ctx));
+            })]
+        | ('!' >> -sep >> unary_expr)[
+            ([](auto& ctx) {
+               _val(ctx) = ast::make_expr<ast::bool_negative_expr>(_attr(ctx));
+            })]
         ;
 
       auto postfix_expr_def =
@@ -106,6 +128,7 @@ namespace pebble {
           identifier,
           primary_expr,
           postfix_expr,
+          unary_expr,
 
           real_args);
 
