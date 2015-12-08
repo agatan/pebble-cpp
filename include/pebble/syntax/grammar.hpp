@@ -48,6 +48,24 @@ namespace pebble {
             _val(ctx) = _attr(ctx);
           }
         };
+
+        struct make_binop_tail
+        {
+          std::string op;
+
+          make_binop_tail(std::string const& o): op(o) {}
+
+          template <typename Context>
+          void operator()(Context& ctx)
+          {
+            _val(ctx) = ast::make_expr<ast::binop_expr>(
+                op,
+                _val(ctx),
+                _attr(ctx)
+              );
+          }
+        };
+
       } // namespace helper
 
 
@@ -56,6 +74,8 @@ namespace pebble {
       x3::rule<class primary_expr, ast::expression> const primary_expr;
       x3::rule<class postfix_expr, ast::expression> const postfix_expr;
       x3::rule<class unary_expr, ast::expression> const unary_expr;
+      x3::rule<class mul_div_expr, ast::expression> const mul_div_expr;
+      x3::rule<class add_sub_expr, ast::expression> const add_sub_expr;
 
       x3::rule<class identifier, std::string> const identifier;
       x3::rule<class real_args, std::vector<ast::expression>> const real_args;
@@ -69,7 +89,23 @@ namespace pebble {
         ;
 
       auto expression_def =
-          unary_expr
+          add_sub_expr
+        ;
+
+      auto add_sub_expr_def =
+          mul_div_expr[helper::assign_action()]
+          >> *(
+            ('-' >> -sep >> mul_div_expr)[helper::make_binop_tail("-")]
+          | ('+' >> -sep >> mul_div_expr)[helper::make_binop_tail("+")]
+          )
+        ;
+
+      auto mul_div_expr_def =
+          unary_expr[helper::assign_action()]
+          >> *(
+            ('*' >> -sep >> unary_expr)[helper::make_binop_tail("*")]
+          | ('/' >> -sep >> unary_expr)[helper::make_binop_tail("/")]
+          )
         ;
 
       auto unary_expr_def =
@@ -129,6 +165,8 @@ namespace pebble {
           primary_expr,
           postfix_expr,
           unary_expr,
+          mul_div_expr,
+          add_sub_expr,
 
           real_args);
 

@@ -61,6 +61,26 @@ BOOST_AUTO_TEST_SUITE(parse)
     BOOST_TEST("(NEG (APPLY (IDENT fun)))" == pebble::utils::stringify(expr));
   }
 
+  BOOST_AUTO_TEST_CASE(binary) {
+    ast::expression expr(*syntax::parse_expression("1 * 2"));
+    BOOST_TEST("(* 1 2)" == pebble::utils::stringify(expr));
+
+    expr = *syntax::parse_expression("1 / 2");
+    BOOST_TEST("(/ 1 2)" == pebble::utils::stringify(expr));
+
+    expr = *syntax::parse_expression("1 + 2");
+    BOOST_TEST("(+ 1 2)" == pebble::utils::stringify(expr));
+
+    expr = *syntax::parse_expression("1 - 2");
+    BOOST_TEST("(- 1 2)" == pebble::utils::stringify(expr));
+
+    expr = *syntax::parse_expression("1 - 2 / 3");
+    BOOST_TEST("(- 1 (/ 2 3))" == pebble::utils::stringify(expr));
+
+    expr = *syntax::parse_expression("1 * 2 + 3");
+    BOOST_TEST("(+ (* 1 2) 3)" == pebble::utils::stringify(expr));
+  }
+
   BOOST_AUTO_TEST_CASE(expression) {
     std::pair<char const*, char const*> test_cases[] = {
       {"TRUE", "true"},
