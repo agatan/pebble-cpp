@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_SUITE(ast)
             ast::make_expr<ast::int_const_expr>(1),
             ast::make_expr<ast::int_const_expr>(2))
         },
-        {"(BLOCK (STMT 1) (STMT TRUE) 3)", ast::make_expr<ast::block_expr>(
+        {"(BLOCK_EXPR (STMT 1) (STMT TRUE) (STMT 3))", ast::make_expr<ast::block_expr>(
             std::vector<ast::statement> {
               ast::make_stmt<ast::expr_stmt>(ast::make_expr<ast::int_const_expr>(1)),
               ast::make_stmt<ast::expr_stmt>(ast::make_expr<ast::bool_const_expr>(true)),
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_SUITE(ast)
       using arg = std::pair<std::string, ast::type>;
 
       std::pair<char const*, ast::definition> test_cases[] = {
-        {"(DEF f ((x (TYPE Int)) (y (TYPE Float))) (RET (TYPE Bool)) (BODY (BLOCK TRUE)))",
+        {"(DEF f ((x (TYPE Int)) (y (TYPE Float))) (RET (TYPE Bool)) (BODY (BLOCK_EXPR (STMT TRUE))))",
           ast::make_definition<ast::function_def>("f",
               std::vector<arg> {
                 std::make_pair("x", ast::type("Int")),

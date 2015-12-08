@@ -78,6 +78,7 @@ namespace pebble {
       x3::rule<class add_sub_expr, ast::expression> const add_sub_expr;
       x3::rule<class if_expr, ast::expression> const if_expr;
       x3::rule<class block_expr, ast::expression> const block_expr;
+      x3::rule<class non_block_expr, ast::expression> const non_block_expr;
 
       x3::rule<class statement, ast::statement> const statement;
 
@@ -105,20 +106,24 @@ namespace pebble {
       auto expression_def =
           if_expr[helper::assign_action()]
         | block_expr[helper::assign_action()]
-        | add_sub_expr[helper::assign_action()]
+        | non_block_expr[helper::assign_action()]
+        ;
+
+      auto non_block_expr_def =
+          add_sub_expr[helper::assign_action()]
         ;
 
       auto block_expr_def =
-          ('{' >> *statement >> '}') [
-            ([](auto& ctx) { _val(ctx) = ast::make_expr<ast::block_expr>(_attr(ctx)); })
-          ]
-        | ('{' >> *statement >> expression >> '}') [
+          ('{' >> *statement >> expression >> '}') [
             ([](auto& ctx) {
               _val(ctx) = ast::make_expr<ast::block_expr>(
                   boost::fusion::at_c<0>(_attr(ctx)),
                   boost::fusion::at_c<1>(_attr(ctx))
                 );
             })
+          ]
+        | ('{' >> *statement >> '}') [
+            ([](auto& ctx) { _val(ctx) = ast::make_expr<ast::block_expr>(_attr(ctx)); })
           ]
         ;
 
@@ -211,9 +216,13 @@ namespace pebble {
       // statements
       auto statement_def =
           (
-            expression >> ';'
+            non_block_expr >> ';'
           )[
-            ([](auto& ctx) { _val(ctx) = ast::make_stmt<ast::expr_stmt>(_attr(ctx)); })]
+            ([](auto& ctx) { _val(ctx) = ast::make_stmt<ast::expr_stmt>(_attr(ctx)); })
+          ]
+        | block_expr[
+            ([](auto& ctx) { _val(ctx) = ast::make_stmt<ast::expr_stmt>(_attr(ctx)); })
+          ]
         ;
 
 
@@ -228,6 +237,7 @@ namespace pebble {
           add_sub_expr,
           if_expr,
           block_expr,
+          non_block_expr,
 
           statement,
 

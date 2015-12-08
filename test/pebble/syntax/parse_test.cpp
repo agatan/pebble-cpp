@@ -83,10 +83,7 @@ BOOST_AUTO_TEST_SUITE(parse)
 
   BOOST_AUTO_TEST_CASE(if_expression) {
     std::pair<char const*, char const*> test_cases[] = {
-      {"(IF TRUE 1 2)", "if (true) 1 else 2"},
-      {"(IF FALSE (APPLY (IDENT f)) UNIT)", "if (false) f()"},
-      {"(IF TRUE (IF FALSE 1 2) UNIT)", "if(true) if(false) 1 else 2 "},
-      {"(IF TRUE (BLOCK 1) (BLOCK 2))", "if (true) { 1 } else { 2 }"}
+      {"(IF TRUE (BLOCK_EXPR (STMT 1)) (BLOCK_EXPR (STMT 2)))", "if (true) { 1 } else { 2 }"}
     };
 
     for (auto&& test_case : test_cases) {
@@ -100,9 +97,11 @@ BOOST_AUTO_TEST_SUITE(parse)
 
   BOOST_AUTO_TEST_CASE(block) {
     std::pair<char const*, char const*> test_cases[] = {
-      {"(BLOCK (STMT (APPLY (IDENT f))) TRUE)", "{ f(); true }"},
-      {"(BLOCK (STMT (APPLY (IDENT f))) (STMT (APPLY (IDENT g))) UNIT)",
-       "{ f(); g(); }"}
+      {"(BLOCK_EXPR (STMT (APPLY (IDENT f))) (STMT TRUE))", "{ f(); true }"},
+      {"(BLOCK (STMT (APPLY (IDENT f))) (STMT (APPLY (IDENT g))))",
+       "{ f(); g(); }"},
+      {"(BLOCK_EXPR (STMT (APPLY (IDENT f))) (STMT (BLOCK_EXPR (STMT 1))))",
+       "{ f(); { 1 }}"}
     };
 
     for (auto&& test_case : test_cases) {

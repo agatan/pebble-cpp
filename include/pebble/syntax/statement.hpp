@@ -36,6 +36,8 @@ namespace pebble {
         {
           return "(STMT " + utils::stringify(expr_) + ")";
         }
+
+        expression const& expr() const { return expr_; }
       };
 
       template <typename T, typename... Args>

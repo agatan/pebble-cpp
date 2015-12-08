@@ -166,14 +166,11 @@ namespace pebble {
       {
       private:
         std::vector<statement> stmts_;
-        expression ret_;
+        bool is_expr;
       public:
         block_expr() = default;
-        explicit block_expr(std::vector<statement> const& e)
-          : stmts_(e), ret_(make_expr<unit_expr>()) {}
-
-        block_expr(std::vector<statement> const& s, expression const& e)
-          : stmts_(s), ret_(e) {}
+        explicit block_expr(std::vector<statement> const& e);
+        block_expr(std::vector<statement> const& s, expression const& e);
 
         std::string to_string() const;
       };

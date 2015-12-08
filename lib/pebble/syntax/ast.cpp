@@ -1,6 +1,8 @@
 #include <pebble/syntax/ast.hpp>
 #include <pebble/utils/stringify.hpp>
 
+#include <boost/variant/get.hpp>
+
 #include <algorithm>
 
 namespace pebble {
@@ -22,13 +24,40 @@ namespace pebble {
         return result;
       }
 
+      block_expr::block_expr(std::vector<statement> const& s)
+        : stmts_(s)
+      {
+        auto const& last(s.back());
+        if (!boost::get<ast::expr_stmt_ptr>(&last)) {
+          is_expr = false;
+          return;
+        }
+        ast::expr_stmt_ptr const& last_e(boost::get<ast::expr_stmt_ptr>(last));
+        if (boost::get<ast::block_expr_ptr>(&last_e->expr()) ||
+            boost::get<ast::if_expr_ptr>(&last_e->expr()))
+        {
+          is_expr = true;
+        } else {
+          is_expr = false;
+        }
+      }
+
+      block_expr::block_expr(std::vector<statement> const& s, expression const& e)
+        : is_expr(true)
+      {
+        stmts_ = s;
+        stmts_.push_back(make_stmt<expr_stmt>(e));
+      }
+
       std::string block_expr::to_string() const
       {
         std::string result("(BLOCK");
+        if (is_expr) {
+          result += "_EXPR";
+        }
         for (auto it = stmts_.begin(); it != stmts_.end(); ++it) {
           result += " " + utils::stringify(*it);
         }
-        result += " " + utils::stringify(ret_);
         result += ")";
         return result;
       }
