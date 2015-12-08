@@ -77,6 +77,7 @@ namespace pebble {
       x3::rule<class mul_div_expr, ast::expression> const mul_div_expr;
       x3::rule<class add_sub_expr, ast::expression> const add_sub_expr;
       x3::rule<class if_expr, ast::expression> const if_expr;
+      x3::rule<class block_expr, ast::expression> const block_expr;
 
       x3::rule<class statement, ast::statement> const statement;
 
@@ -103,7 +104,22 @@ namespace pebble {
       // expressions
       auto expression_def =
           if_expr[helper::assign_action()]
+        | block_expr[helper::assign_action()]
         | add_sub_expr[helper::assign_action()]
+        ;
+
+      auto block_expr_def =
+          ('{' >> *statement >> '}') [
+            ([](auto& ctx) { _val(ctx) = ast::make_expr<ast::block_expr>(_attr(ctx)); })
+          ]
+        | ('{' >> *statement >> expression >> '}') [
+            ([](auto& ctx) {
+              _val(ctx) = ast::make_expr<ast::block_expr>(
+                  boost::fusion::at_c<0>(_attr(ctx)),
+                  boost::fusion::at_c<1>(_attr(ctx))
+                );
+            })
+          ]
         ;
 
       auto if_expr_def =
@@ -211,6 +227,7 @@ namespace pebble {
           mul_div_expr,
           add_sub_expr,
           if_expr,
+          block_expr,
 
           statement,
 
