@@ -84,6 +84,7 @@ namespace pebble {
 
       x3::rule<class definition, ast::definition> const definition;
       x3::rule<class fun_def, ast::definition> const fun_def;
+      x3::rule<class let_def, ast::definition> const let_def;
 
       x3::rule<class identifier, std::string> const identifier;
       x3::rule<class uidentifier, std::string> const uidentifier;
@@ -266,6 +267,7 @@ namespace pebble {
       // definitions
       auto definition_def =
           fun_def[helper::assign_action()]
+        | let_def[helper::assign_action()]
         ;
 
       auto fun_def_def =
@@ -299,6 +301,32 @@ namespace pebble {
           ]
         ;
 
+      auto let_def_def =
+          (
+            helper::keyword("let") > identifier > -(':' > type)
+            > '=' > expression > ';'
+          ) [
+            ([](auto& ctx) {
+              std::string const& name(boost::fusion::at_c<0>(_attr(ctx)));
+              auto const& type(boost::fusion::at_c<1>(_attr(ctx)));
+              auto const& expr(boost::fusion::at_c<2>(_attr(ctx)));
+
+              if (type) {
+                _val(ctx) = ast::make_definition<ast::let_def>(
+                    name,
+                    *type,
+                    expr
+                );
+              } else {
+                _val(ctx) = ast::make_definition<ast::let_def>(
+                    name,
+                    expr
+                );
+              }
+            })
+          ]
+        ;
+
 
       BOOST_SPIRIT_DEFINE(
           expression,
@@ -316,6 +344,7 @@ namespace pebble {
 
           definition,
           fun_def,
+          let_def,
 
           real_args,
           identifier,

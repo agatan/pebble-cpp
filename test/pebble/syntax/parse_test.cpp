@@ -148,4 +148,20 @@ BOOST_AUTO_TEST_SUITE(parse)
     }
   }
 
+
+  BOOST_AUTO_TEST_CASE(let) {
+    std::pair<char const*, char const*> test_cases[] = {
+      {"(LET (x (TYPE Int)) 1)", "let x: Int = 1;"},
+      {"(LET y (+ 1 2))", "let y = 1 + 2;"}
+    };
+
+    for (auto&& test_case : test_cases) {
+      char const* expected;
+      char const* src;
+      std::tie(expected, src) = test_case;
+      ast::definition def(*syntax::parse_definition(src));
+      BOOST_TEST(expected == pebble::utils::stringify(def));
+    }
+  }
+
 BOOST_AUTO_TEST_SUITE_END()
