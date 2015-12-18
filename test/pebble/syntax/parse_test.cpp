@@ -8,6 +8,7 @@
 #include <pebble/syntax/ast.hpp>
 #include <pebble/syntax/parse.hpp>
 #include <pebble/utils/stringify.hpp>
+#include <pebble/syntax/position.hpp>
 
 BOOST_AUTO_TEST_SUITE(parse)
 
@@ -162,6 +163,20 @@ BOOST_AUTO_TEST_SUITE(parse)
       ast::definition def(*syntax::parse_definition(src));
       BOOST_TEST(expected == pebble::utils::stringify(def));
     }
+  }
+
+  BOOST_AUTO_TEST_CASE(pos) {
+    auto src = "1 - 3";
+    auto expr = *syntax::parse_expression(src);
+    BOOST_TEST(1 == syntax::get_line(expr));
+    BOOST_TEST(1 == syntax::get_col(expr));
+    BOOST_TEST(5 == syntax::get_len(expr));
+
+    src = "func(1, 2, 3)";
+    expr = *syntax::parse_expression(src);
+    BOOST_TEST(1 == syntax::get_line(expr));
+    BOOST_TEST(1 == syntax::get_col(expr));
+    BOOST_TEST(13 == syntax::get_len(expr));
   }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -14,7 +14,7 @@ namespace pebble {
         return std::move(std::make_shared<T>(std::forward<Args>(args)...));
       }
 
-      class int_const_expr
+      class int_const_expr: public ast_node_base
       {
       private:
         int data_;
@@ -27,7 +27,7 @@ namespace pebble {
         int data() const { return data_; }
       };
 
-      class float_const_expr
+      class float_const_expr: public ast_node_base
       {
       private:
         double data_;
@@ -40,7 +40,7 @@ namespace pebble {
         double data() const { return data_; }
       };
 
-      class ident_expr
+      class ident_expr: public ast_node_base
       {
       private:
         std::string name_;
@@ -53,7 +53,7 @@ namespace pebble {
         std::string const& name() const { return name_; }
       };
 
-      class bool_const_expr
+      class bool_const_expr: public ast_node_base
       {
       private:
         bool data_;
@@ -72,13 +72,13 @@ namespace pebble {
         bool data() const { return data_; }
       };
 
-      class unit_expr
+      class unit_expr: public ast_node_base
       {
       public:
         std::string to_string() const { return "UNIT"; }
       };
 
-      class apply_expr
+      class apply_expr: public ast_node_base
       {
       private:
         expression function_;
@@ -90,9 +90,12 @@ namespace pebble {
           : function_(f), args_(a) {}
 
         std::string to_string() const;
+
+        expression const& function() const { return function_; }
+        std::vector<expression> const& args() const { return args_; }
       };
 
-      class bool_negative_expr
+      class bool_negative_expr: public ast_node_base
       {
       private:
         expression operand_;
@@ -106,7 +109,7 @@ namespace pebble {
         }
       };
 
-      class negative_expr
+      class negative_expr: public ast_node_base
       {
       private:
         expression operand_;
@@ -120,7 +123,7 @@ namespace pebble {
         }
       };
 
-      class if_expr
+      class if_expr: public ast_node_base
       {
       private:
         expression cond_;
@@ -140,7 +143,7 @@ namespace pebble {
         }
       };
 
-      class binop_expr
+      class binop_expr: public ast_node_base
       {
       private:
         std::string op_;
@@ -160,9 +163,13 @@ namespace pebble {
           return "(" + op_ + " " + utils::stringify(lhs_) +
             " " + utils::stringify(rhs_) + ")";
         }
+
+        expression const& lhs() const { return lhs_; }
+        expression const& rhs() const { return rhs_; }
+        std::string const& op() const { return op_; }
       };
 
-      class block_expr
+      class block_expr: public ast_node_base
       {
       private:
         std::vector<statement> stmts_;

@@ -10,7 +10,7 @@ namespace pebble {
     namespace ast {
       // definitions
 
-      class function_def
+      class function_def : public ast_node_base
       {
       private:
         std::string name_;
@@ -31,7 +31,7 @@ namespace pebble {
         std::string to_string() const;
       };
 
-      class let_def
+      class let_def : public ast_node_base
       {
       private:
         std::string name_;

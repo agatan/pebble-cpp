@@ -12,6 +12,9 @@ namespace pebble {
     using string_iterator_t = std::string::const_iterator;
     using iterator_t = boost::spirit::line_pos_iterator<string_iterator_t>;
 
+    // for extract error handler from X3 context.
+    struct error_handler_tag;
+
     boost::optional<ast::expression>
       parse_expression(iterator_t&, string_iterator_t const&, iterator_t const&);
 

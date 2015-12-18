@@ -20,6 +20,26 @@ namespace pebble {
         std::string to_string() const { return "(TYPE " + name_ + ")"; }
       };
 
+      // position container
+      struct ast_node_base
+      {
+        std::string filepath;
+        std::size_t line;
+        std::size_t col;
+        std::size_t len;
+      };
+
+      template <typename Node>
+      void node_annotate(Node&& node, std::size_t line, std::size_t col, std::size_t len)
+      {
+        boost::apply_visitor(
+            [line, col, len](auto&& ast) {
+              ast->line = line; ast->col = col; ast->len = len;
+            },
+            node);
+      }
+
+
 #define PEBBLE_MAKE_NODE(name) class name; using name##_ptr = std::shared_ptr<name>
 
       PEBBLE_MAKE_NODE(int_const_expr);

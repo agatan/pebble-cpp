@@ -8,7 +8,7 @@ namespace pebble {
   namespace syntax {
     namespace ast {
 
-      class def_stmt
+      class def_stmt: public ast_node_base
       {
       private:
         definition def_;
@@ -23,7 +23,7 @@ namespace pebble {
         }
       };
 
-      class expr_stmt
+      class expr_stmt: public ast_node_base
       {
       private:
         expression expr_;
