@@ -21,3 +21,6 @@ if(NOT without-test)
     enable_testing()
     add_subdirectory(test)
 endif()
+
+# binary
+add_subdirectory(bin)
