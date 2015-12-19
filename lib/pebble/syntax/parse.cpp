@@ -1,5 +1,4 @@
 #include <pebble/syntax/parse.hpp>
-#include <pebble/syntax/skip_grammar.hpp>
 #include <pebble/syntax/grammar.hpp>
 #include <pebble/syntax/config.hpp>
 
@@ -47,7 +46,7 @@ namespace pebble {
         boost::spirit::x3::phrase_parse(
             it, end,
             make_with_context(expression(), begin),
-            skip, expr);
+            x3::ascii::space, expr);
 
       if (!success || it != end) {
         return boost::none;
@@ -75,7 +74,7 @@ namespace pebble {
         boost::spirit::x3::phrase_parse(
             it, end,
             make_with_context(statement(), begin),
-            skip, stmt);
+            x3::ascii::space, stmt);
 
       if (!success || it != end) {
         return boost::none;
@@ -104,7 +103,7 @@ namespace pebble {
         boost::spirit::x3::phrase_parse(
             it, end,
             make_with_context(definition(), begin),
-            skip, def);
+            x3::ascii::space, def);
 
       if (!success || it != end) {
         return boost::none;

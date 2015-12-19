@@ -1,8 +1,6 @@
 #ifndef __PEBBLE_SYNTAX_CONFIG_HPP_
 #define __PEBBLE_SYNTAX_CONFIG_HPP_
 
-#include <pebble/syntax/skip_grammar.hpp>
-
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/include/support_line_pos_iterator.hpp>
 
@@ -19,7 +17,7 @@ namespace pebble {
           orig_begin_iter_tag,
           iterator_t,
           boost::spirit::x3::phrase_parse_context<
-            decltype(skip)
+            boost::spirit::x3::ascii::space_type
           >::type
         >::type;
 

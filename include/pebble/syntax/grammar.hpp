@@ -120,8 +120,6 @@ namespace pebble {
 
 
       // base or helper rules
-      auto sep = (lit('\n') | "\r\n");
-
       auto identifier_def = x3::lexeme[
           x3::lower >> *(x3::alnum | char_('_'))
         ]
@@ -133,8 +131,8 @@ namespace pebble {
         ;
 
       auto real_args_def =
-          ('(' >> -sep >> ')')[([](auto& ctx) { _val(ctx) = std::vector<ast::expression>{}; })]
-        | ('(' >> -sep >> (expression % (',' >> -sep)) >> -sep >> ')')[
+          (lit('(') >> ')')[([](auto& ctx) { _val(ctx) = std::vector<ast::expression>{}; })]
+        | ('(' >> (expression % ',') >> ')')[
             ([](auto& ctx) { _val(ctx) = _attr(ctx); })]
         ;
 
@@ -191,8 +189,8 @@ namespace pebble {
 
       auto if_expr_def =
           (
-            helper::keyword("if") > -sep > '(' > -sep > expression > -sep > ')'
-            > -sep > expression > -sep > -(helper::keyword("else") > -sep > expression)
+            helper::keyword("if") > '(' > expression > ')'
+            > expression > -(helper::keyword("else") > expression)
           )[
             ([](auto& ctx) {
               ast::expression const& cond(boost::fusion::at_c<0>(_attr(ctx)));
@@ -218,29 +216,29 @@ namespace pebble {
       auto add_sub_expr_def =
           mul_div_expr[helper::assign_action()]
           >> *helper::annotate(
-            ('-' >> -sep >> mul_div_expr)[helper::make_binop_tail("-")]
-          | ('+' >> -sep >> mul_div_expr)[helper::make_binop_tail("+")]
+            ('-' >> mul_div_expr)[helper::make_binop_tail("-")]
+          | ('+' >> mul_div_expr)[helper::make_binop_tail("+")]
           )
         ;
 
       auto mul_div_expr_def =
           unary_expr[helper::assign_action()]
           >> *helper::annotate(
-            ('*' >> -sep >> unary_expr)[helper::make_binop_tail("*")]
-          | ('/' >> -sep >> unary_expr)[helper::make_binop_tail("/")]
+            ('*' >> unary_expr)[helper::make_binop_tail("*")]
+          | ('/' >> unary_expr)[helper::make_binop_tail("/")]
           )
         ;
 
       auto unary_expr_def =
           postfix_expr[helper::assign_action()]
         | helper::annotate(
-            ('-' >> -sep >> unary_expr)[
+            ('-' >> unary_expr)[
               ([](auto& ctx) {
                  _val(ctx) = ast::make_expr<ast::negative_expr>(_attr(ctx));
               })]
             )
         | helper::annotate(
-            ('!' >> -sep >> unary_expr)[
+            ('!' >> unary_expr)[
               ([](auto& ctx) {
                  _val(ctx) = ast::make_expr<ast::bool_negative_expr>(_attr(ctx));
               })]
@@ -259,7 +257,7 @@ namespace pebble {
 
       auto primary_expr_def =
           constant
-        | '(' >> -sep >> expression >> -sep >> ')'
+        | '(' >> expression >> ')'
         ;
 
       auto constant_def =
