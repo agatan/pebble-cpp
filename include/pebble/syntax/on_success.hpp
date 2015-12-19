@@ -2,6 +2,8 @@
 #define __PEBBLE_SYNTAX_ON_SUCCESS_HPP_
 
 #include <pebble/syntax/ast.hpp>
+#include <pebble/syntax/config.hpp>
+
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>
 #include <iostream>
@@ -9,9 +11,6 @@
 namespace pebble {
   namespace syntax {
     namespace x3 = boost::spirit::x3;
-
-    // for extract original iterator from X3 context.
-    struct orig_begin_iter_tag;
 
     // annotate source position for AST node on success.
     struct on_success_base

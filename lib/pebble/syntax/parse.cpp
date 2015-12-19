@@ -1,11 +1,33 @@
 #include <pebble/syntax/parse.hpp>
 #include <pebble/syntax/skip_grammar.hpp>
 #include <pebble/syntax/grammar.hpp>
+#include <pebble/syntax/config.hpp>
 
 namespace pebble {
   namespace syntax {
 
     namespace x3 = boost::spirit::x3;
+
+    namespace grammar {
+      BOOST_SPIRIT_INSTANTIATE(expression_type, iterator_t, context_type);
+      BOOST_SPIRIT_INSTANTIATE(statement_type, iterator_t, context_type);
+      BOOST_SPIRIT_INSTANTIATE(definition_type, iterator_t, context_type);
+    } // namespace grammar
+
+    grammar::expression_type const& expression()
+    {
+      return grammar::expression;
+    }
+
+    grammar::statement_type const& statement()
+    {
+      return grammar::statement;
+    }
+
+    grammar::definition_type const& definition()
+    {
+      return grammar::definition;
+    }
 
     template <typename Grammar, typename Iter>
     decltype(auto) make_with_context(Grammar&& grammar, Iter&& orig_begin)
@@ -24,7 +46,7 @@ namespace pebble {
       bool const success =
         boost::spirit::x3::phrase_parse(
             it, end,
-            make_with_context(expression, begin),
+            make_with_context(expression(), begin),
             skip, expr);
 
       if (!success || it != end) {
@@ -52,7 +74,7 @@ namespace pebble {
       bool const success =
         boost::spirit::x3::phrase_parse(
             it, end,
-            make_with_context(statement, begin),
+            make_with_context(statement(), begin),
             skip, stmt);
 
       if (!success || it != end) {
@@ -81,7 +103,7 @@ namespace pebble {
       bool const success =
         boost::spirit::x3::phrase_parse(
             it, end,
-            make_with_context(definition, begin),
+            make_with_context(definition(), begin),
             skip, def);
 
       if (!success || it != end) {

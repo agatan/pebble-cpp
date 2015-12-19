@@ -90,8 +90,8 @@ namespace pebble {
       } // namespace helper
 
 #define PEBBLE_RULE(name,result,base) \
-      class name : base {};                   \
-      x3::rule<name, result> const name;
+      class name##_class : base {};                   \
+      x3::rule<name##_class, result> const name;
 
       PEBBLE_RULE(expression, ast::expression, public on_success_base);
       PEBBLE_RULE(constant, ast::expression, public on_success_base);
@@ -384,9 +384,6 @@ namespace pebble {
           );
 
     } // namespace grammar
-    using grammar::expression;
-    using grammar::statement;
-    using grammar::definition;
 
   } // namespace syntax
 } // namespace pebble
