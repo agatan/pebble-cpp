@@ -9,6 +9,9 @@
 #include <pebble/syntax/parse.hpp>
 #include <pebble/utils/stringify.hpp>
 #include <pebble/syntax/position.hpp>
+#include <pebble/syntax/on_error.hpp>
+
+#include <sstream>
 
 BOOST_AUTO_TEST_SUITE(parse)
 
@@ -177,6 +180,37 @@ BOOST_AUTO_TEST_SUITE(parse)
     BOOST_TEST(1 == syntax::get_line(expr));
     BOOST_TEST(1 == syntax::get_col(expr));
     BOOST_TEST(13 == syntax::get_len(expr));
+  }
+
+  BOOST_AUTO_TEST_CASE(failed_message) {
+    std::string src("func(1, 2");
+    std::stringstream err_out;
+    syntax::iterator_t it(std::cbegin(src));
+    syntax::iterator_t const orig_begin(std::cbegin(src));
+    syntax::iterator_t const last(std::cend(src));
+    syntax::error_handler<syntax::iterator_t> handler(it, last, err_out, "_none_");
+
+    auto parser =
+      syntax::with_orig_iter(orig_begin,
+          syntax::with_error_handler(handler,syntax::expression()))
+      ;
+
+    ast::expression expr;
+    bool const success =
+      boost::spirit::x3::phrase_parse(
+          it, last,
+          parser,
+          boost::spirit::x3::ascii::space, expr);
+
+    if (success && it == last) {
+      err_out << pebble::utils::stringify(expr);
+    }
+
+    char const* expected = "In file _none_, line 1:\n"
+                           "Syntax Error. Expecting: ')' here:\n"
+                           "func(1, 2\n"
+                           "_________^_\n";
+    BOOST_TEST(expected == err_out.str());
   }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -10,6 +10,12 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2 -s -DNDEBUG -march=native")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g3 -Og -pg")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -s -DNDEBUG -march=native")
 
+# find boost
+find_package(Boost REQUIRED COMPONENTS system)
+if (!${Boost_FOUND})
+  message(FATAL_ERROR "Boost library not found. Please install boost libraries.")
+endif()
+
 # include path
 include_directories(include)
 

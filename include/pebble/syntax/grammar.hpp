@@ -3,6 +3,7 @@
 
 #include <pebble/syntax/ast.hpp>
 #include <pebble/syntax/on_success.hpp>
+#include <pebble/syntax/on_error.hpp>
 
 #include <boost/spirit/home/x3.hpp>
 
@@ -89,26 +90,29 @@ namespace pebble {
 
       } // namespace helper
 
-#define PEBBLE_RULE(name,result,base) \
-      class name##_class : base {};                   \
+#define PEBBLE_RULE_WITH_S_E(name,result) \
+      class name##_class : public on_success_base, public on_error_base {}; \
+      x3::rule<name##_class, result> const name;
+#define PEBBLE_RULE_WITH_S(name, result) \
+      class name##_class : public on_success_base {}; \
       x3::rule<name##_class, result> const name;
 
-      PEBBLE_RULE(expression, ast::expression, public on_success_base);
-      PEBBLE_RULE(constant, ast::expression, public on_success_base);
-      PEBBLE_RULE(primary_expr, ast::expression, public on_success_base);
-      PEBBLE_RULE(postfix_expr, ast::expression, public on_success_base);
-      PEBBLE_RULE(unary_expr, ast::expression, public on_success_base);
-      PEBBLE_RULE(mul_div_expr, ast::expression, public on_success_base);
-      PEBBLE_RULE(add_sub_expr, ast::expression, public on_success_base);
-      PEBBLE_RULE(if_expr, ast::expression, public on_success_base);
-      PEBBLE_RULE(block_expr, ast::expression, public on_success_base);
-      PEBBLE_RULE(non_block_expr, ast::expression, public on_success_base);
+      PEBBLE_RULE_WITH_S_E(expression, ast::expression);
+      PEBBLE_RULE_WITH_S_E(constant, ast::expression);
+      PEBBLE_RULE_WITH_S_E(primary_expr, ast::expression);
+      PEBBLE_RULE_WITH_S_E(postfix_expr, ast::expression);
+      PEBBLE_RULE_WITH_S_E(unary_expr, ast::expression);
+      PEBBLE_RULE_WITH_S_E(mul_div_expr, ast::expression);
+      PEBBLE_RULE_WITH_S_E(add_sub_expr, ast::expression);
+      PEBBLE_RULE_WITH_S_E(if_expr, ast::expression);
+      PEBBLE_RULE_WITH_S_E(block_expr, ast::expression);
+      PEBBLE_RULE_WITH_S_E(non_block_expr, ast::expression);
 
-      PEBBLE_RULE(statement, ast::statement, public on_success_base);
+      PEBBLE_RULE_WITH_S_E(statement, ast::statement);
 
-      PEBBLE_RULE(definition, ast::definition, public on_success_base);
-      PEBBLE_RULE(fun_def, ast::definition, public on_success_base);
-      PEBBLE_RULE(let_def, ast::definition, public on_success_base);
+      PEBBLE_RULE_WITH_S_E(definition, ast::definition);
+      PEBBLE_RULE_WITH_S_E(fun_def, ast::definition);
+      PEBBLE_RULE_WITH_S_E(let_def, ast::definition);
 
       x3::rule<class identifier, std::string> const identifier;
       x3::rule<class uidentifier, std::string> const uidentifier;
@@ -132,7 +136,7 @@ namespace pebble {
 
       auto real_args_def =
           (lit('(') >> ')')[([](auto& ctx) { _val(ctx) = std::vector<ast::expression>{}; })]
-        | ('(' >> (expression % ',') >> ')')[
+        | ('(' > (expression % ',') > ')')[
             ([](auto& ctx) { _val(ctx) = _attr(ctx); })]
         ;
 
@@ -151,7 +155,7 @@ namespace pebble {
 
       auto def_args_def =
           (lit('(') >> ')')[([](auto& ctx) { _val(ctx) = std::vector<std::pair<std::string, ast::type>>(); })]
-        | ('(' >> (arg % ',') >> ')') [helper::assign_action()]
+        | ('(' > (arg % ',') > ')') [helper::assign_action()]
         ;
 
       auto type_def =
@@ -174,7 +178,7 @@ namespace pebble {
         ;
 
       auto block_expr_def =
-          ('{' >> *statement >> expression >> '}') [
+          ('{' >> *statement >> expression > '}') [
             ([](auto& ctx) {
               _val(ctx) = ast::make_expr<ast::block_expr>(
                   boost::fusion::at_c<0>(_attr(ctx)),
@@ -182,7 +186,7 @@ namespace pebble {
                 );
             })
           ]
-        | ('{' >> *statement >> '}') [
+        | ('{' >> *statement > '}') [
             ([](auto& ctx) { _val(ctx) = ast::make_expr<ast::block_expr>(_attr(ctx)); })
           ]
         ;
@@ -215,7 +219,7 @@ namespace pebble {
 
       auto add_sub_expr_def =
           mul_div_expr[helper::assign_action()]
-          >> *helper::annotate(
+          > *helper::annotate(
             ('-' >> mul_div_expr)[helper::make_binop_tail("-")]
           | ('+' >> mul_div_expr)[helper::make_binop_tail("+")]
           )
@@ -223,7 +227,7 @@ namespace pebble {
 
       auto mul_div_expr_def =
           unary_expr[helper::assign_action()]
-          >> *helper::annotate(
+          > *helper::annotate(
             ('*' >> unary_expr)[helper::make_binop_tail("*")]
           | ('/' >> unary_expr)[helper::make_binop_tail("/")]
           )
@@ -247,7 +251,7 @@ namespace pebble {
 
       auto postfix_expr_def =
           primary_expr[([](auto& ctx) { _val(ctx) = _attr(ctx); })]
-          >> *helper::annotate(
+          > *helper::annotate(
             (real_args)[
               ([](auto& ctx) {
                 _val(ctx) = ast::make_expr<ast::apply_expr>(_val(ctx), _attr(ctx));
@@ -257,7 +261,7 @@ namespace pebble {
 
       auto primary_expr_def =
           constant
-        | '(' >> expression >> ')'
+        | '(' > expression > ')'
         ;
 
       auto constant_def =
@@ -335,13 +339,13 @@ namespace pebble {
           ) [
             ([](auto& ctx) {
               std::string const& name(boost::fusion::at_c<0>(_attr(ctx)));
-              auto const& type(boost::fusion::at_c<1>(_attr(ctx)));
+              auto const& type_(boost::fusion::at_c<1>(_attr(ctx)));
               auto const& expr(boost::fusion::at_c<2>(_attr(ctx)));
 
-              if (type) {
+              if (type_) {
                 _val(ctx) = ast::make_definition<ast::let_def>(
                     name,
-                    *type,
+                    *type_,
                     expr
                 );
               } else {

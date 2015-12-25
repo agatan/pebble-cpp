@@ -17,10 +17,10 @@ namespace pebble {
     {
       template <typename Iterator, typename Attr, typename Context>
       inline void on_success(
-          Iterator const& first,
-          Iterator const& last,
-          Attr& attr,
-          Context const& ctx) const
+          Iterator const& ,
+          Iterator const& ,
+          Attr& ,
+          Context const& ) const
       {
       }
 
@@ -58,7 +58,7 @@ namespace pebble {
       template <typename Iterator, typename Attr, typename Context>
       inline void on_success_impl(
           Iterator const& first,
-          Iterator const& last,
+          Iterator const& ,
           Attr& attr,
           Context const& ctx) const
       {

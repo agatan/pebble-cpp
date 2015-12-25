@@ -28,24 +28,17 @@ namespace pebble {
       return grammar::definition;
     }
 
-    template <typename Grammar, typename Iter>
-    decltype(auto) make_with_context(Grammar&& grammar, Iter&& orig_begin)
-    {
-      return x3::with<orig_begin_iter_tag>(orig_begin)[
-               grammar
-             ];
-    }
-
     boost::optional<ast::expression> parse_expression(
         iterator_t& it,
         iterator_t const& begin,
         iterator_t const& end)
     {
       ast::expression expr;
+      error_handler<iterator_t> err(it, end, std::cerr, "_none_");
       bool const success =
         boost::spirit::x3::phrase_parse(
             it, end,
-            make_with_context(expression(), begin),
+            with_orig_iter(begin, with_error_handler(err, expression())),
             x3::ascii::space, expr);
 
       if (!success || it != end) {
@@ -70,10 +63,11 @@ namespace pebble {
         iterator_t const& end)
     {
       ast::statement stmt;
+      error_handler<iterator_t> err(it, end, std::cerr, "_none_");
       bool const success =
         boost::spirit::x3::phrase_parse(
             it, end,
-            make_with_context(statement(), begin),
+            with_orig_iter(begin, with_error_handler(err, statement())),
             x3::ascii::space, stmt);
 
       if (!success || it != end) {
@@ -99,10 +93,11 @@ namespace pebble {
         iterator_t const& end)
     {
       ast::definition def;
+      error_handler<iterator_t> err(it, end, std::cerr, "_none_");
       bool const success =
         boost::spirit::x3::phrase_parse(
             it, end,
-            make_with_context(definition(), begin),
+            with_orig_iter(begin, with_error_handler(err, definition())),
             x3::ascii::space, def);
 
       if (!success || it != end) {

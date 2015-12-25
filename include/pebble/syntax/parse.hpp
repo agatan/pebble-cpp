@@ -5,6 +5,7 @@
 #include <pebble/syntax/config.hpp>
 
 #include <boost/spirit/home/x3.hpp>
+#include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
 #include <boost/optional/optional.hpp>
 
 namespace pebble {
@@ -31,8 +32,24 @@ namespace pebble {
     grammar::statement_type const& statement();
     grammar::definition_type const& definition();
 
-    // for extract error handler from X3 context.
-    struct error_handler_tag;
+    template <typename Iter, typename Grammar>
+    decltype(auto) with_orig_iter(Iter&& orig_begin, Grammar&& grammar)
+    {
+      return boost::spirit::x3::with<orig_begin_iter_tag>(orig_begin)[
+               grammar
+             ];
+    }
+
+    template <typename Grammar>
+    decltype(auto) with_error_handler(
+        boost::spirit::x3::error_handler<iterator_t>& err,
+        Grammar&& grammar)
+    {
+      return boost::spirit::x3::with<boost::spirit::x3::error_handler_tag>(std::ref(err))[
+               grammar
+             ];
+    }
+
 
     boost::optional<ast::expression>
       parse_expression(iterator_t&, string_iterator_t const&, iterator_t const&);
